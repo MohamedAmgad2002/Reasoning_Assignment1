@@ -29,17 +29,7 @@ def move_negation_inward(word: str):
 
 # Looks for any ~~ in the string and removes them
 def remove_double_negation(word: str):
-    result = ''
-    i = 0
-    while i < len(word):
-        if word[i] != '~':
-            result += word[i]
-        else:
-            if i < len(word)-1 and word[i+1] == '~':
-                i += 1
-            else:
-                result += word[i]
-        i += 1
+    result = word.replace('~~', '')
     return result
 
 print(eliminate_implication("(smth) -> (y)"))
