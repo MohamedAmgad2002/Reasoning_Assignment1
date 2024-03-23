@@ -1,3 +1,6 @@
+from Exists import Exists
+from ForAll import ForAll
+
 # Takes a statement that looks like the following: smth -> y
 def eliminate_implication(word: str):
     for i in range(len(word)):
@@ -32,6 +35,9 @@ def remove_double_negation(word: str):
     result = word.replace('~~', '')
     return result
 
-print(eliminate_implication("(smth) -> (y)"))
-print(move_negation_inward("~(~~~X | ~Y)"))
-print(remove_double_negation(move_negation_inward("~(~~~X | ~Y)")))
+# print(eliminate_implication("(smth) -> (y)"))
+# print(move_negation_inward("~(~~~X | ~Y)"))
+# print(remove_double_negation(move_negation_inward("~(~~~X | ~Y)")))
+e = Exists('z', "Exists(q(x,y,z))")
+e.changeVariable('a')
+print(e.statement)
