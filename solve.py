@@ -151,9 +151,9 @@ def resolve(clause1, clause2):
     return None
 
 # demo
-# KB = ["(loves(x, f(y)) | ~kill(x,y))", "(kill(John,Ali))", "(bird(tweety))"]
-# standardize(KB)
-# print(KB)
+KB = ["(loves(x, f(y)) | ~kill(x,y))", "(kill(John,Ali))", "(bird(tweety))"]
+standardize(KB)
+print(KB)
 
 
 clause1 = "(Dog(f(x)))"

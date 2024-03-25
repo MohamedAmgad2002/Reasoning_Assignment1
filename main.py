@@ -1,21 +1,15 @@
 from Exists import Exists
 from ForAll import ForAll
+# from Parse import *
 
 vars = [chr(i) for i in range(114, 123)]
-for i in range(82, 91):
-    vars.append(chr(i))
-
 f_names = [chr(i) for i in range(102, 114)]
-for i in range(82, 91):
-    vars.append(chr(i))
-consts = [chr(i) for i in range(97, 102)]
+consts = [chr(i) for i in range(65, 91)]
 
-
-
-# Takes a statement that looks like the following: (smth) -> (y)
+# Takes a statement that looks like the following: (smth) => (y)
 def eliminate_implication(word: str):
     for i in range(len(word)-1):
-        if word[i:i+2] == '->':
+        if word[i:i+2] == '=>':
             word = '~' + word[:i] + '|' + word[i+2:]
 
     return word
@@ -81,13 +75,33 @@ def getVariable(word: str):
         if word[i] == ',':
             return word[7:i]
 
-statement = "ForAll(x, p(x)) | ForAll(x, q(x) <=> Exists(y, f(x,y)))"
-n = count_quantifiers(statement)
-print(n)
-v = getVariable(statement)
-print(v)
+# statement1 = "ForAll(x, p(x)) | ForAll(x, q(x) <=> Exists(y, f(x,y)))"
+
+statement1 = "ForAll(x, (T(x) => ~M(x)))"
+statement2 = "ForAll(x, (ForAll(y, (ForAll(z, (M(x) => ~M(y), & ~M(z)))))))"
+statement3 = "T(Arthur) => M(Carleton))"
+statement4 = "T(Bertram) => ~M(Bertram)"
+statement5 = "T(Carleton) => ~M(Carleton))"
+statement6 = "T(Arthur)"
+statement7 = "T(Bertram)"
+prove = "T(Carleton)"
+
+statement1 = "Exists(x, (Dog(x) & Owns(Jack, x)))"
+statement2 = "ForAll(x, ((Exists(y, (Dog(y) & Owns(x,y)))) => (AnimalLover(x))))"
+statement3 = "ForAll(x, ((AnimalLover(x)) => (ForAll(y, (Animal(y) => ~Kills(x,y))))))"
+statement4 = "Kills(Jack,Tuna) | Kills(Curioisity,Tuna)"
+statement5 = "Cat(Tuna)"
+statement6 = "ForAll(x, (Cat(x) => Animal(x)))"
+prove = "~Kills(Curiosity,Tuna)"
+
+# n = count_quantifiers(statement2)
+# print(n)
+# v = getVariable(statement1)
+# print(v)
 
 # for i in range(n):
+
+
 
 
 """

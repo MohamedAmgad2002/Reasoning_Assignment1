@@ -2,7 +2,7 @@ class Exists():
     statement = '('
     variable = ''
 
-    def __init__(self, variable: str, word: str, *argv):
+    def __init__(self, variable: str, word: str, skol: list):
         if not word.startswith("Exists("):
             raise Exception(f"An Error has occured inside the class Exists, string:{word} doesn't start with Exists(")
         self.variable = variable

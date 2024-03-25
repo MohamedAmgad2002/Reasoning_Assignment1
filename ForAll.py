@@ -1,5 +1,5 @@
 class ForAll():
-    def __init__(self, variable: str, word: str, *argv):
+    def __init__(self, variable: str, word: str, skol: list):
         if not word.startswith("ForAll("):
             raise Exception(f"An Error has occured inside the class ForAll, string doesn't start with ForAll(")
         self.variable = variable
