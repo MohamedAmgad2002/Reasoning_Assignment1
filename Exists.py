@@ -3,8 +3,8 @@ class Exists():
     variable = ''
 
     def __init__(self, variable: str, word: str, *argv):
-        # if not word.startswith("Exists("):
-            # raise Exception(f"An Error has occured inside the class Exists, string:{word} doesn't start with Exists(")
+        if not word.startswith("Exists("):
+            raise Exception(f"An Error has occured inside the class Exists, string:{word} doesn't start with Exists(")
         self.variable = variable
         self.statement = word
         print(self.statement)
