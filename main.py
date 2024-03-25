@@ -37,7 +37,7 @@ def getVariable(word: str):
 # statement1 = "ForAll(x, p(x)) | ForAll(x, q(x) <=> Exists(y, f(x,y)))"
 
 statement1 = "ForAll(x, (T(x) => ~M(x)))"
-statement2 = "ForAll(x, (ForAll(y, (ForAll(z, (M(x) => ~M(y), & ~M(z))))))"
+statement2 = "ForAll(x, (ForAll(y, (ForAll(z, (M(x) => ~M(y) & ~M(z))))))"
 statement3 = "T(Arthur) => M(Carleton))"
 statement4 = "T(Bertram) => ~M(Bertram)"
 statement5 = "T(Carleton) => ~M(Carleton))"

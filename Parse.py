@@ -202,11 +202,10 @@ def CNFify(word: str):
     word = eliminate_implication(word)
     print(word)
 
-    print(word)
     # Check for double negation
     # word = remove_double_negation(word)
+    # print(word)
 
-    print(word)
     # Check for quantifiers
     c = count_quantifiers(word)
     # print(c)\
@@ -231,4 +230,8 @@ def CNFify(word: str):
         print(i.variable, end=', ')
         print(i.statement)
 
-CNFify("ForAll(y, ((Exists(x, (Test(y,x))) & Easy(y)) => ForAll(z, (Pass(z,y)))))")
+# CNFify("ForAll(y, ((Exists(x, (Test(y,x))) & Easy(y)) => ForAll(z, (Pass(z,y)))))")
+# CNFify("(ForAll(x, (ForAll(y, (ForAll(z, ((M(x)) => (~M(y) & ~M(z))))))))")
+# NEED TO ADD A CHECKER IN CASE OF MOVING NEGATION INTO BRACKET THAT THERE IS NO LETTER BEFORE IT
+# CAN REMOVE THE BRACKETS ON T(x) TO UNDERSTAND
+CNFify("(ForAll(x, ((T(x)) => (~M(x)))))")
