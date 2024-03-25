@@ -1,9 +1,9 @@
 class ForAll():
-    def __init__(self, variable: str, word: str, skol: list):
+    def __init__(self, word: str, skol: list):
         if not word.startswith("ForAll("):
-            raise Exception(f"An Error has occured inside the class ForAll, string doesn't start with ForAll(")
-        self.variable = variable
-        self.statement = word
+            raise Exception(f"An Error has occured inside the class ForAll, string:{word} doesn't start with ForAll(")
+        self.variable = word[7:word.find(',')]
+        self.statement = word[word.find(', ')+2:-1]
         print(self.statement)
 
     def changeVariable(self, nVariable: str):
