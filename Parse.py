@@ -193,6 +193,50 @@ def extract_quantifier(word: str, index: int):
 
 # def extract_quantifier_variable(word: str, index: int):
     
+def skolemize(word: str, c: list, c_end: list, quantifiers: list):
+
+    global consts
+    global f_names
+    c_counter = 0
+    f_counter = 0
+    for i in range(len(quantifiers)):
+        start_index = c[i]
+        end_index = c_end[i]
+        if type(quantifiers[i]) != Exists:
+            continue
+        if len(quantifiers[i].skol) == 0:
+            # print("Replace with const")
+            var = quantifiers[i].variable
+            quantifiers[i].changeVariable(consts[c_counter])
+            for j in range(len(quantifiers)):
+                if c_end[j] < end_index and i != j:
+                    quantifiers[j].changeOtherVariable(var, consts[c_counter])
+            c_counter += 1
+        else:
+            # print("Replace with function")
+            var = quantifiers[i].variable
+            newVar = f_names[f_counter]+'('+','.join(quantifiers[i].skol)+')'
+            print(var, newVar)
+            print(c)
+            print(c_end)
+            for i in range(len(c)):
+                c[i] += len(newVar) - len(var)
+                c_end[i] += len(newVar) - len(var)
+            print(c)
+            print(c_end)
+            quantifiers[i].changeVariable(newVar)
+            for j in range(len(quantifiers)):
+                if c_end[j] < end_index and i != j:
+                    # print(quantifiers[j].statement)
+                    quantifiers[j].changeOtherVariable(var, newVar)
+            f_counter += 1
+        word = word[:start_index] + quantifiers[i].pre + quantifiers[i].statement + ')' + word[end_index+1:]
+
+
+    
+
+
+    return word
 
 def CNFify(word: str):
     print(word)
@@ -210,13 +254,25 @@ def CNFify(word: str):
     c = count_quantifiers(word)
     # print(c)\
     used_vars = []
+    scoped_vars = []
     quantifiers = []
+    c_end = []
+    ended = 0
+    for i in c:
+        c_end.append(getMatchingBracket(word, i+6))
     for i in c:
         # print(extract_quantifier(word, i))
+        if i >= c_end[ended]:
+            print("Removed: ", scoped_vars[ended])
+            scoped_vars.remove(scoped_vars[ended])
+            ended += 1
+
         if word[i] == 'E':
-            quantifiers.append(Exists(extract_quantifier(word, i), []))
+            quantifiers.append(Exists(extract_quantifier(word, i), scoped_vars))
+            scoped_vars.append(quantifiers[-1].variable)
+            print("Added: ", scoped_vars[-1])
         else:
-            quantifiers.append(ForAll(extract_quantifier(word, i), []))
+            quantifiers.append(ForAll(extract_quantifier(word, i), scoped_vars))
         if quantifiers[-1].variable in used_vars:
             for i in vars:
                 if i not in used_vars:
@@ -225,13 +281,31 @@ def CNFify(word: str):
         used_vars.append(quantifiers[-1].variable)
         # print(used_vars)
     # print(getMatchingBracket(word, c[0]+6))
-    for i in quantifiers:
-        print(type(i), end=', ')
-        print(i.variable, end=', ')
-        print(i.statement)
+        
+    for i in range(len(quantifiers)):
+        start_index = c[i]
+        end_index = c_end[i]
+        # print("Was:    ", word)
+        word = word[:start_index] + quantifiers[i].pre + quantifiers[i].statement + ')' + word[end_index+1:]
+        # print("Now is: ", word)
+
+    print("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
+    print(word)
+    word = skolemize(word, c, c_end, quantifiers)
+    print("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
+    print(word)
+    # quantifiers[-1].changeVariable('zayat')
+    # for i in quantifiers[::-1]:
+
+    #     print(type(i), end=', ')
+    #     print(i.variable, end=', ')
+        # print(i.skol.index('y'), end=', \n')
+    #     print(i.statement)
+    # print(word.replace(quantifiers[-1].statement, 'test'))
 
 # CNFify("ForAll(y, ((Exists(x, (Test(y,x))) & Easy(y)) => ForAll(z, (Pass(z,y)))))")
-# CNFify("(ForAll(x, (ForAll(y, (ForAll(z, ((M(x)) => (~M(y) & ~M(z))))))))")
+CNFify("(Exists(y, ((ForAll(x, (Test(y,x))) & Easy(y)) => Exists(x, (Pass(x,y))))))")
 # NEED TO ADD A CHECKER IN CASE OF MOVING NEGATION INTO BRACKET THAT THERE IS NO LETTER BEFORE IT
 # CAN REMOVE THE BRACKETS ON T(x) TO UNDERSTAND
-CNFify("(ForAll(x, ((T(x)) => (~M(x)))))")
+# CNFify("(ForAll(x, (ForAll(y, (ForAll(z, ((M(x)) => (~M(y) & ~M(z))))))))")
+# CNFify("(ForAll(x, ((T(x)) => (~M(x)))))")
