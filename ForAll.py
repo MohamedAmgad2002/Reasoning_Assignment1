@@ -10,7 +10,8 @@ class ForAll():
         self.variable = word[7:word.find(',')]
         self.statement = word[word.find(', ')+2:-1]
         self.skol = skol2.copy()
-        print(self.statement)
+        self.pre += self.variable + ', '
+        # print(self.statement)
 
     def changeVariable(self, newVariable: str):
         # print('-=-=-=-=-=-')

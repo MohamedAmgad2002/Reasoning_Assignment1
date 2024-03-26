@@ -11,7 +11,7 @@ class Exists():
         self.statement = word[word.find(', ')+2:-1]
         self.skol = skol2.copy()
         self.pre += self.variable + ', '
-        print(self.statement)
+        # print(self.statement)
 
     def changeVariable(self, newVariable: str):
         # print('-=-=-=-=-=-')
@@ -29,7 +29,7 @@ class Exists():
         self.statement = self.statement.replace('('+var1, '('+var2)
         self.statement = self.statement.replace(var1+',', var2+',')
         self.statement = self.statement.replace(','+var1, ','+var2)
-        # print(self.skol)
+
         ndx = -1
         for i in range(len(self.skol)):
             if self.skol[i] == var1:
