@@ -10,7 +10,7 @@ def get_params(param_str):
 
 
 def is_variable(param):
-    return param.islower() and len(param.strip()) == 1
+    return param[0].islower()
 
 
 def is_func(param):
@@ -18,7 +18,7 @@ def is_func(param):
 
 
 def is_constant(param):
-    return param.isupper() and len(param.strip()) >= 1
+    return param[0].isupper()
 
 
 def replace_innermost_func(code, idx):
@@ -39,10 +39,10 @@ def standardize(kb):
             params = params.split(',')
             for j in range(len(params)):
                 # If the parameter is a variable, append the clause index to it
-                if is_variable(params[j]):
+                if is_variable(params[j].strip()):
                     params[j] = params[j] + str(idx)
                 # If the parameter is a function expression
-                elif is_func(params[j]):
+                elif is_func(params[j].strip()):
                     params[j] = replace_innermost_func(params[j], idx)
             # Replace the literal parameters with the new parameters
             literals[i] = literals[i][:literals[i].find(
@@ -118,8 +118,8 @@ def resolve(clause1, clause2):
     clause1, clause2 = unify(clause1, clause2)
 
     # Split each clause into literals using '|' as the delimiter
-    literals1 = clause1[1:-1].split('|')
-    literals2 = clause2[1:-1].split('|')
+    literals1 = [x.strip() for x in clause1[1:-1].split('|')]
+    literals2 = [x.strip() for x in clause2[1:-1].split('|')]
 
     can_resolve = False
 
@@ -130,16 +130,16 @@ def resolve(clause1, clause2):
             # Check if the first literal is a negation of the second literal
             if literals1[i].startswith('~') and not literals2[j].startswith('~') and literals1[i][1:].strip() == literals2[j].strip():
                 # If it is, remove the literals from their respective clauses
-                literals1.pop(i)
-                literals2.pop(j)
+                literals1.remove(literals1[i])
+                literals2.remove(literals2[j])
                 # Set the flag to indicate that resolution is possible
                 can_resolve = True
                 break
             # Check if the second literal is a negation of the first literal
             elif not literals1[i].startswith('~') and literals2[j].startswith('~') and literals1[i].strip() == literals2[j][1:].strip():
                 # If it is, remove the literals from their respective clauses
-                literals1.pop(i)
-                literals2.pop(j)
+                literals1.remove(literals1[i])
+                literals2.remove(literals2[j])
                 # Set the flag to indicate that resolution is possible
                 can_resolve = True
                 break
@@ -150,13 +150,36 @@ def resolve(clause1, clause2):
     # If resolution is not possible, return None
     return None
 
-# demo
-KB = ["(loves(x, f(y)) | ~kill(x,y))", "(kill(John,Ali))", "(bird(tweety))"]
-standardize(KB)
-print(KB)
+
+def resolution(KB, query, max_iter=1000):
+    # Add the negation of the query to the knowledge base
+    KB.append(f"{query[0] + '~' + query[1:]}")
+    # Standardize the knowledge base
+    KB = standardize(KB)
+    iterations = 0
+    # Iterate over each pair of clauses in the knowledge base
+    while len(KB) > 0 and iterations < max_iter:
+        clause1 = KB.pop(0)
+        clause2 = KB.pop(0)
+        if clause1 != clause2:
+            # Attempt to resolve the two clauses
+            resolvent = resolve(clause1, clause2)
+            # If resolution is successful, return True
+            if resolvent is None:
+                KB.append(clause1)
+                KB.append(clause2)
+            elif resolvent == '()':
+                return True
+            # Add the resolvent to the knowledge base
+            else:
+                KB.append(resolvent)
+        iterations += 1
+    return False
 
 
-clause1 = "(Dog(f(x)))"
-clause2 = "(~Dog(y) | ~Owns(x, y) | AnimalLover(x))"
-clause1, clause2 = standardize([clause1, clause2])
-print(resolve(clause1, clause2))
+
+query = "(Dog(Bolt))"
+KB = ["(Dog(y) | ~Owns(x, y) | AnimalLover(x))", "(Owns(John, Bolt))", "(~AnimalLover(John))"]
+# clause2 = "(~Dog(y))"
+# print(standardize(KB + [query]))
+print(resolution(KB, query, 200))
