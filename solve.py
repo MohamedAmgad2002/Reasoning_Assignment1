@@ -153,7 +153,10 @@ def resolve(clause1, clause2):
 
 def resolution(KB, query, max_iter=1000):
     # Add the negation of the query to the knowledge base
-    KB.append(f"{query[0] + '~' + query[1:]}")
+    if query[1] == '~':
+        KB.append(f"{query[0] + query[2:]}")
+    else:
+        KB.append(f"{query[0] + '~' + query[1:]}")
     # Standardize the knowledge base
     KB = standardize(KB)
     iterations = 0
@@ -174,12 +177,14 @@ def resolution(KB, query, max_iter=1000):
             else:
                 KB.append(resolvent)
         iterations += 1
+    if iterations >= max_iter:
+        return None
     return False
 
 
-
-query = "(Dog(Bolt))"
-KB = ["(Dog(y) | ~Owns(x, y) | AnimalLover(x))", "(Owns(John, Bolt))", "(~AnimalLover(John))"]
-# clause2 = "(~Dog(y))"
-# print(standardize(KB + [query]))
-print(resolution(KB, query, 200))
+if __name__ == "__main__":
+    query = "(Dog(Bolt))"
+    KB = ["(Dog(y) | ~Owns(x, y) | AnimalLover(x))", "(Owns(John, Bolt))", "(~AnimalLover(John))"]
+    # clause2 = "(~Dog(y))"
+    # print(standardize(KB + [query]))
+    print(resolution(KB, query, 200))
