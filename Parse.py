@@ -60,22 +60,38 @@ def distribute(word: str):
 # smth is a combination of ors, ands, and nots
 # HAS TO HAVE BRACKETS
 def move_negation_inward(word: str):
-    # for i in range(len(word)):
-    if word.find('~(') == -1:
+    # print("  0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
+    # print(" ", word, end='-=-=-=-')
+    index = word.find('~(')
+    index2= word.find('~Exists(')
+    index3= word.find('~ForAll(')
+    cutoff = 1
+    if index != -1:
+        cutoff = 2
+        end = getMatchingBracket(word, index+1)
+        # print(index, end)
+        if index != 0 or end != len(word)-1:
+            return move_negation_inward(word[:index] + move_negation_inward(word[index:end+1]) + word[end+1:])
+    elif index2 != -1:
+        end = getMatchingBracket(word, word.find('(', index2+7))
+        if index2 != 0 or end != len(word)-1:
+            index2 = index2 + 7
+            return move_negation_inward(word[:index2] + move_negation_inward(word[index2:end+1]) + word[end+1:])
+    elif index3 != -1:
+        end = getMatchingBracket(word, word.find('(', index2+7))
+        if index3 != 0 or end != len(word)-1:
+            index3 = index3 + 7
+            return move_negation_inward(word[:index3] + move_negation_inward(word[index3:end+1]) + word[end+1:])
+    else:
         return word
-    if word.startswith('~('):
-        word = word[2:]
-    elif word.startswith('~'):
-        word = word[1:]
-    if word.endswith(')'):
-        word = word[:len(word)-1]
+    # print()
+    word = word[cutoff:]
+    word = word[:len(word)-1]
+
     parts = word.split()
     comp = ['~'+i for i in parts]
-    # print(comp)
-    # print('(', end='')
     result = ''
     for j in comp:
-        # print(j, end='-\n')
         if j == '~|':
             result += '&'
         elif j == '~&':
@@ -89,20 +105,54 @@ def move_negation_inward(word: str):
         else:
             result += f' {j} '
     result = '(' + result[1:len(result)-1] + ')'
-    # print(result)
-    more = result.find('~(')
-    if more != -1:
-        # print("ENTERED")
-        preBracket = result[:more]
-        # print(preBracket)
-        moreEnd = getMatchingBracket(result, more+1)
-        # print(result[more:moreEnd+1])
-        postBracket = result[moreEnd:]
-        moreResult = move_negation_inward(result[more:moreEnd+1])
-        # print(moreResult)
-        # print(postBracket)
-        result = preBracket + moreResult + postBracket
+    if result.find('~(') != -1:
+        return move_negation_inward(result)
     return result
+
+# def move_negation_inward(word: str):
+#     # for i in range(len(word)):
+#     # if word.find('~(') == -1:
+#     #     return word
+#     if word.startswith('~('):
+#         word = word[2:]
+#     elif word.startswith('~'):
+#         word = word[1:]
+#     if word.endswith(')'):
+#         word = word[:len(word)-1]
+    # parts = word.split()
+    # comp = ['~'+i for i in parts]
+    # # print(comp)
+    # # print('(', end='')
+    # result = ''
+    # for j in comp:
+    #     # print(j, end='-\n')
+    #     if j == '~|':
+    #         result += '&'
+    #     elif j == '~&':
+    #         result += '|'
+    #     elif j.startswith('~Exists('):
+    #         result += " ForAll"
+    #         result += j[7:]
+    #     elif j.startswith('~ForAll('):
+    #         result += " Exists"
+    #         result += j[7:]
+    #     else:
+    #         result += f' {j} '
+    # result = '(' + result[1:len(result)-1] + ')'
+    # # print(result)
+    # more = result.find('~(')
+    # if more != -1:
+    #     # print("ENTERED")
+    #     preBracket = result[:more]
+    #     # print(preBracket)
+    #     moreEnd = getMatchingBracket(result, more+1)
+    #     # print(result[more:moreEnd+1])
+    #     postBracket = result[moreEnd:]
+    #     moreResult = move_negation_inward(result[more:moreEnd+1])
+    #     # print(moreResult)
+    #     # print(postBracket)
+    #     result = preBracket + moreResult + postBracket
+    # return result
 
 # Looks for any ~~ in the string and removes them
 def remove_double_negation(word: str):
@@ -146,21 +196,7 @@ def getFirstInstance(word: str, symbol: str):
 
 def splitStatement(word: str):
   # print(word)
-    bicond = getFirstInstance(word, '<=>')
-    if bicond != -1:
-        s1 = word[:bicond-1]
-        s2 = word[bicond+4:]
-        s = eliminate_implication(s1 + ' => ' + s2)
-        s += ' & ' + eliminate_implication(s2 + ' => ' + s1)
-        splitStatement(s1)
-        splitStatement(s2)
-      # print(s)
-        return
-    cond = getFirstInstance(word, '=>')
-    if cond != -1:
-        splitStatement(word[:cond-1])
-        splitStatement(word[cond+3:])
-        return
+
     conjunct = getFirstInstance(word, '&')
     if conjunct != -1:
         splitStatement(word[:conjunct-1])
@@ -181,13 +217,17 @@ def splitStatement(word: str):
 
 def getMatchingBracket(word: str, index: int):
     count = 1
+    # print("GetMatchingBracket: ",word, index, end=' ')
     for i in range(index+1, len(word)):
         if word[i] == '(':
             count += 1
         elif word[i] == ')':
             count -= 1
             if count == 0:
+                # print(count, i, end='/\n')
                 return i
+    # print(count)
+    return -1
 
 def getMatchingBracketBackwards(word: str, index: int):
     count = 1
@@ -224,8 +264,6 @@ def extract_quantifier(word: str, index: int):
         end = getMatchingBracket(word, index+7)
         return word[index:end+1]
 
-# def extract_quantifier_variable(word: str, index: int):
-    
 def skolemize(word: str, c: list, c_end: list, quantifiers: list):
 
     global consts
@@ -279,12 +317,15 @@ def skolemize(word: str, c: list, c_end: list, quantifiers: list):
     return word
 
 def removeMatchingBracket(word: str, index: int = 0):
+    # print(word)
     if word[index] == '(':
         i = getMatchingBracket(word, index)
-        # print(i)
+        # print(index, i)
         if i == len(word)-1:
+            # print(i)
             return removeMatchingBracket(word[:index] + word[index+1:i] + word[i+1:])
         else:
+            # print(i)
             return word[:index] + word[index+1:i] + word[i+1:]
     return word
 
@@ -301,16 +342,18 @@ def removeQuantifiers(word):
       # print(end_index)
       # print('012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789')
         # word = word.lstrip().rstrip()
-      # print(word, "Before: ")
+        # print("==", word, "Before: ")
         word = word[:start_index] + word[offset+2:end_index] + word[end_index+1:]
         # word = word.lstrip().rstrip()
-      # print(word, "After : ")
+        # print("==", word, "After : ")
+        
+        c, c_end = count_quantifiers(word)
+
         word = removeMatchingBracket(word)
       # print(word, "After : ")
         c, c_end = count_quantifiers(word)
 
     return word
-
 
 def build_quantifiers(word, quantifiers, c, c_end):
     used_vars = []
@@ -362,9 +405,12 @@ def removeDuplicateBrackets(word: str):
     # print(word)
     changed = False
     for i in range(len(word)-1):
-        if word[i:i+2] == '((' and ((getMatchingBracket(word, i) + 1) == getMatchingBracket(word, i+1)):
-            word = removeMatchingBracket(word, i)
-            changed = True
+        if word[i:i+2] == '((':
+            # print(@chingBracket(word, i))
+            # print(getMatchingBracket(word, i+1))
+            if (getMatchingBracket(word, i) == getMatchingBracket(word, i+1) + 1):
+                word = removeMatchingBracket(word, i)
+                changed = True
     if changed:
         return removeDuplicateBrackets(word)
     else:
@@ -406,10 +452,15 @@ def CNFify(word: str):
     word = removeDuplicateBrackets(word)
     # print(word)
     word = distribute(word)
-
+    # print(word)
+    word = removeDuplicateBrackets(word)
+    # print(word)
     word = move_negation_inward(word)
-
-    return word
+    # print(word)
+    word = removeMatchingBracket(word)
+    # print(word)
+    result = process(word)
+    return result
 
     # quantifiers[-1].changeVariable('zayat')
     # for i in quantifiers[::-1]:
@@ -420,16 +471,38 @@ def CNFify(word: str):
     #   # print(i.statement)
     # print(word.replace(quantifiers[-1].statement, 'test'))
 
+def finish_brackets(word):
+    arr = [i.rstrip().lstrip() for i in word.split('|')]
+    for i in range(len(arr)):
+        if arr[i].startswith('(') and getMatchingBracket(arr[i], 0) == len(arr[i])-1:
+            arr[i] = arr[i][1:len(arr[i])-1]
 
+    result = ''
+    for i in arr:
+        result += i + ' | '
+    return result[:len(result)-3]
+
+def process(word):
+    arr = word.split('&')
+    result = []
+    for i in arr:
+        # print(finish_brackets(i.rstrip().lstrip()))
+        # print(finish_brackets(removeMatchingBracket(i.rstrip().lstrip())))
+        result.append('('+finish_brackets(removeMatchingBracket(i.rstrip().lstrip()))+')')
+
+    return result
 if __name__ == "__main__":
-    # x = CNFify("ForAll(y, ((Exists(x, (Test(y,x))) & Easy(y)) => ForAll(z, (Pass(z,y))))")
-    # y = CNFify("(Exists(y, ((ForAll(x, (Test(y,x))) & Easy(y)) => Exists(x, (Pass(x,y))))))")
+    # x = CNFify("(ForAll(y, ((Exists(x, (Test(y,x))) & Easy(y)) => ForAll(z, (Pass(z,y)))))")
+    # x = getMatchingBracket("(((ForAll(x, (~Test(y,x))) | ~Easy(y)) | ForAll(z, (Pass(z,y)))))", 0)
+    y = CNFify("(Exists(y, ((ForAll(x, (Test(y,x))) & Easy(y)) => Exists(x, (Pass(x,y))))))")
     # print(x)
-    # print(y)
+    print(y)
     # NEED TO ADD A CHECKER IN CASE OF MOVING NEGATION INTO BRACKET THAT THERE IS NO LETTER BEFORE IT
     # CAN REMOVE THE BRACKETS ON T(x) TO UNDERSTAND
     # z = CNFify("(ForAll(x, (ForAll(y, (ForAll(z, ((M(x)) => (~M(y) & ~M(z))))))))")
-    z = CNFify("(ForAll(x, (ForAll(y, (ForAll(z, ((M(x) | M(z)) => (~M(y) & ~M(z)))))))))")
-    print(z)
+    # z = CNFify("(ForAll(x, (ForAll(y, (ForAll(z, ((M(x) | M(z)) => (~M(y) & ~M(z)))))))))")
+    # z = CNFify("~(Exists(x, Exists(y, (Pass(x,y) & Fail(x,y)))))")
+    # z = move_negation_inward("~(Pass(a,f(a)) & Fail(a,f(a)))")
+    # print(z)
     # CNFify("(ForAll(x, ((T(x)) => (~M(x)))))")
     # CNFify("(Te(x) => ~M(x))")
