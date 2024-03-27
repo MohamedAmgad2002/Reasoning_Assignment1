@@ -3,6 +3,7 @@ import re
 # regular expression to match a function expression
 FUNC_EXPR = r"\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\((.*?)\)"
 
+
 def get_params(param_str):
     open_index = param_str.find('(')
     close_index = param_str.rfind(')')
@@ -127,6 +128,8 @@ def resolve(clause1, clause2):
     for i in range(len(literals1)):
         # Iterate over each literal in the second clause
         for j in range(len(literals2)):
+            if i >= len(literals1) or j >= len(literals2):
+                return None
             # Check if the first literal is a negation of the second literal
             if literals1[i].startswith('~') and not literals2[j].startswith('~') and literals1[i][1:].strip() == literals2[j].strip():
                 # If it is, remove the literals from their respective clauses
@@ -154,9 +157,9 @@ def resolve(clause1, clause2):
 def resolution(KB, query, max_iter=1000):
     # Add the negation of the query to the knowledge base
     if query[1] == '~':
-        KB.append(f"{query[0] + query[2:]}")
+        KB = [f"{query[0] + query[2:]}"] + KB
     else:
-        KB.append(f"{query[0] + '~' + query[1:]}")
+        KB = [f"{query[0] + '~' + query[1:]}"] + KB
     # Standardize the knowledge base
     KB = standardize(KB)
     iterations = 0
@@ -169,13 +172,20 @@ def resolution(KB, query, max_iter=1000):
             resolvent = resolve(clause1, clause2)
             # If resolution is successful, return True
             if resolvent is None:
-                KB.append(clause1)
+                KB = [clause1] + KB
+                # KB = [clause2] + KB
+                # KB.append(clause1)
                 KB.append(clause2)
             elif resolvent == '()':
+                print("Pairing: ", clause1, 'and', clause2)
+                print("Output:       {}", )
                 return True
             # Add the resolvent to the knowledge base
             else:
-                KB.append(resolvent)
+                print("Pairing: ", clause1, 'and', clause2)
+                # KB.append(resolvent)
+                print("Output:      ", resolvent)
+                KB = [resolvent] + KB
         iterations += 1
     if iterations >= max_iter:
         return None
@@ -184,7 +194,8 @@ def resolution(KB, query, max_iter=1000):
 
 if __name__ == "__main__":
     query = "(Dog(Bolt))"
-    KB = ["(Dog(y) | ~Owns(x, y) | AnimalLover(x))", "(Owns(John, Bolt))", "(~AnimalLover(John))"]
+    KB = ["(Dog(y) | ~Owns(x, y) | AnimalLover(x))",
+          "(Owns(John, Bolt))", "(~AnimalLover(John))"]
     # clause2 = "(~Dog(y))"
     # print(standardize(KB + [query]))
     print(resolution(KB, query, 200))

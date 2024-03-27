@@ -5,12 +5,14 @@ from solve import resolution
 # print(CNFify(statement1))
 # (~Test(y,x) | ~Easy(y) | (Pass(z,y)))
 
+
 def loadStatement(word: list, kb: list):
     # print('run')
     for i in word:
         # print(type(i))
         kb.append(i)
     return kb
+
 
 print("=====================================")
 statement1 = "ForAll(x, ((T(x)) => (~M(x))))"
@@ -29,7 +31,6 @@ x6 = CNFify(statement6)
 x7 = CNFify(statement7)
 out = [x1, x2, x3, x4, x5, x6, x7]
 kb = []
-print("before standardize")
 for i in out:
     loadStatement(i, kb)
 for i in kb:
@@ -39,12 +40,13 @@ for i in kb:
 # for i in kb:
     # print(i)
 # USE RESOLUTION TO PROVE THAT
-prove1 = "(T(Carleton))"
-prove2 = "(T(Arthur))"
-print("after standardize")
+prove1 = "(~T(Carleton))"
+prove2 = "(~M(Arthur))"
 # USE RESOLUTION TO PROVE THAT
-print(resolution(kb, prove1, 200))
-print(resolution(kb, prove2, 200))
+if resolution(kb, prove1, 200):
+    print('{}')
+if resolution(kb, prove2, 200):
+    print('{}')
 print("=====================================")
 statement1 = "ForAll(x, ((Read(x)) => (~Stupid(x))))"
 statement2 = "Read(John) & Wealthy(John)"
@@ -60,16 +62,14 @@ x5 = CNFify(statement5)
 x6 = CNFify(statement6)
 out = [x1, x2, x3, x4, x5, x6]
 kb = []
-print("before standardize")
 for i in out:
     loadStatement(i, kb)
 for i in kb:
     print(i)
-
-print("after standardize")
 # USE RESOLUTION TO PROVE THAT
 prove = "(Exciting(x))"
-print(resolution(kb, prove, 200))
+if resolution(kb, prove, 200):
+    print('{}')
 print("=====================================")
 statement1 = "ForAll(x, (ForAll(y, ((CScourse(x) & Test(y,x)) => (Exists(z, Fail(z,y)))))))"
 statement1 = "ForAll(x, (ForAll(y, ((CScourse(x)) => (Exists(z, Fail(z,y)))))))"
@@ -85,13 +85,12 @@ x4 = CNFify(statement4)
 x5 = CNFify(statement5)
 out = [x1, x2, x3, x4, x5]
 kb = []
-print("before standardize")
 for i in out:
     loadStatement(i, kb)
 for i in kb:
     print(i)
-print("after standardize")
-print(resolution(kb, prove, 20000))
+if resolution(kb, prove, 20000):
+    print('{}')
 # for i in kb:
-    # print(i)
+# print(i)
 # USE RESOLUTION TO PROVE THAT
