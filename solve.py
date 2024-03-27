@@ -173,8 +173,6 @@ def resolution(KB, query, max_iter=1000):
             # If resolution is successful, return True
             if resolvent is None:
                 KB = [clause1] + KB
-                # KB = [clause2] + KB
-                # KB.append(clause1)
                 KB.append(clause2)
             elif resolvent == '()':
                 print("Pairing: ", clause1, 'and', clause2)
@@ -183,19 +181,9 @@ def resolution(KB, query, max_iter=1000):
             # Add the resolvent to the knowledge base
             else:
                 print("Pairing: ", clause1, 'and', clause2)
-                # KB.append(resolvent)
                 print("Output:      ", resolvent)
                 KB = [resolvent] + KB
         iterations += 1
     if iterations >= max_iter:
         return None
     return False
-
-
-if __name__ == "__main__":
-    query = "(Dog(Bolt))"
-    KB = ["(Dog(y) | ~Owns(x, y) | AnimalLover(x))",
-          "(Owns(John, Bolt))", "(~AnimalLover(John))"]
-    # clause2 = "(~Dog(y))"
-    # print(standardize(KB + [query]))
-    print(resolution(KB, query, 200))
