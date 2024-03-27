@@ -1,18 +1,10 @@
 from Parse import CNFify
 from solve import resolution
-# print("==============Testing================")
-# statement1 = """ForAll(y, (((Exists(x, (Test(y,x))) & Easy(y)) => (ForAll(z, (Pass(z,y)))))"""
-# print(CNFify(statement1))
-# (~Test(y,x) | ~Easy(y) | (Pass(z,y)))
-
 
 def loadStatement(word: list, kb: list):
-    # print('run')
     for i in word:
-        # print(type(i))
         kb.append(i)
     return kb
-
 
 print("=====================================")
 statement1 = "ForAll(x, ((T(x)) => (~M(x))))"
@@ -35,18 +27,13 @@ for i in out:
     loadStatement(i, kb)
 for i in kb:
     print(i)
-# print(kb)
-# print(len(kb))
-# for i in kb:
-    # print(i)
-# USE RESOLUTION TO PROVE THAT
 prove1 = "(~T(Carleton))"
 prove2 = "(~M(Arthur))"
-# USE RESOLUTION TO PROVE THAT
 if resolution(kb, prove1, 200):
     print('{}')
 if resolution(kb, prove2, 200):
     print('{}')
+
 print("=====================================")
 statement1 = "ForAll(x, ((Read(x)) => (~Stupid(x))))"
 statement2 = "Read(John) & Wealthy(John)"
@@ -66,10 +53,12 @@ for i in out:
     loadStatement(i, kb)
 for i in kb:
     print(i)
-# USE RESOLUTION TO PROVE THAT
+
 prove = "(Exciting(x))"
+
 if resolution(kb, prove, 200):
     print('{}')
+
 print("=====================================")
 statement1 = "ForAll(x, (ForAll(y, ((CScourse(x) & Test(y,x)) => (Exists(z, Fail(z,y)))))))"
 statement1 = "ForAll(x, (ForAll(y, ((CScourse(x)) => (Exists(z, Fail(z,y)))))))"
@@ -91,6 +80,3 @@ for i in kb:
     print(i)
 if resolution(kb, prove, 20000):
     print('{}')
-# for i in kb:
-# print(i)
-# USE RESOLUTION TO PROVE THAT
